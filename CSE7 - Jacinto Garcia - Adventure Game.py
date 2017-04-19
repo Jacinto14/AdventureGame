@@ -8,11 +8,11 @@ class Character(object):
         self.dodamage = dodamage
         self.name = name
         self.health = health
-        self.bag = ['Poison, Potion']
+        self.bag = ['Poison']
         self.armor = armor
 
-    def pick_up(self, item):
-        self.bag.append(str(item))
+    def pick_up(self, items):
+        self.bag.append(items)
         print('You pick up the item')
         print(self.bag)
 
@@ -539,7 +539,7 @@ Grapp = GrapplingHook('Ay', 20, 1)
 Good_Fishing_Rod = FishingRod('Ay', 20, 1)
 Wrench = Wrench('Ay', 20, 1)
 OldComputer = Computer('Ay', 20, 1, False)
-Pencil = Pencil('Ay', 20, 1, 1)
+Pencil = Pencil('Pencil', 20, 1, 1)
 
 
 # World Map
@@ -562,46 +562,46 @@ class Room(object):
         node = globals()[getattr(self, direction)]
 
 # Rooms
-London = Room(['M1911', 'Pencil'], 'London, United Kingdom', None, 'Liege', 'Paris', 'Ocean', None, None,
+London = Room([Gunn, Pencil], 'London, United Kingdom', None, 'Liege', 'Paris', 'Ocean', None, None,
               'Industrial Center of the United Kingdom')
-Liege = Room(['Waffle'], 'Liege, Belgium', None, 'Berlin', 'Switzerland', 'London', None, None,
+Liege = Room([Waffle], 'Liege, Belgium', None, 'Berlin', 'Switzerland', 'London', None, None,
              'There is a waffle store near you.')
-Washington = Room(['OldComputer'], 'Washington DC', None, 'Ocean', None, 'Plato', None, None,
+Washington = Room([OldComputer], 'Washington DC', None, 'Ocean', None, 'Plato', None, None,
                   'Woodrow Wilson recently gave his inaugural speech, but the\
 US hasn\'t entered the Great War yet')
-Paris = Room(['Bomb'], 'Paris, France', 'London', None, None, 'Ocean', None, None,
+Paris = Room([Bomb], 'Paris, France', 'London', None, None, 'Ocean', None, None,
              'You can see the eiffel tower')
-Ocean = Room(['Good_Fishing_Rod'], 'The Pacific Ocean', None, 'Paris', None, 'Washington', None, None,
+Ocean = Room([Good_Fishing_Rod], 'The Pacific Ocean', None, 'Paris', None, 'Washington', None, None,
              '6,000 kilometers of blue water')
-Switzerland = Room(['Wrench'], 'Switzerland', 'Liege', 'Sarajevo', 'Gallipoli', None, None, None,
+Switzerland = Room([Wrench], 'Switzerland', 'Liege', 'Sarajevo', 'Gallipoli', None, None, None,
                    'A completely neutral country, there is almost nothing to\
 do here.')
-Gallipoli = Room(['Gunn'], 'Gallipoli, Italy', 'Switzerland', 'Constantinople', None, None, None, None,
+Gallipoli = Room([Gunn], 'Gallipoli, Italy', 'Switzerland', 'Constantinople', None, None, None, None,
                  'The Central Powers have completely taken this area over.\
  Watch your step!')
 
-Constantinople = Room(['Belt'], 'Constantinople, Ottoman Empire', 'Moscow', None, None, 'Gallipoli', None, None,
+Constantinople = Room([Belt], 'Constantinople, Ottoman Empire', 'Moscow', None, None, 'Gallipoli', None, None,
                       'Capital of the Ottoman Empire, there are many people looking\
  at you with a concerned face')
-Sarajevo = Room(['Posion'], 'Sarajevo, Austria-Hungary', None, None, None, 'Switzerland', None, None,
+Sarajevo = Room([Posion], 'Sarajevo, Austria-Hungary', None, None, None, 'Switzerland', None, None,
                 'The hearth of this brutal war.\
  You can see Austro-Hungarian solders down the street.')
-Moscow = Room(['Belt'], 'Moscow, Russian Empire', None, 'Maze', 'Constantinople', None, None, None,
+Moscow = Room([Belt], 'Moscow, Russian Empire', None, 'Maze', 'Constantinople', None, None, None,
               'Very cold. Atleast the Central Powers haven\'t \
  invaded yet...')
 
-Plato = Room(['Blade'], 'Plato, Missouri', None, 'Washington', None, 'Fresno', None, None,
+Plato = Room([Blade], 'Plato, Missouri', None, 'Washington', None, 'Fresno', None, None,
              'The mean center of the US population')
 Philadelphia = Room(['Good_Fishing_Rod'], 'Philadelphia, Pennsylvania', 'New_York', None, 'Washington', None, None,
                     None,
                     'You can smell the Liberty bell where you are standing, or\
  it could be a cheesesteak...')
-New_York = Room(['Blade'], 'New York, New York', None, None, 'Philadelphia', None, None, None,
+New_York = Room([Blade], 'New York, New York', None, None, 'Philadelphia', None, None, None,
                 'Most populous US city.')
-Fresno = Room(['Nuke'], 'Fresno, California', None, 'Plato', None, None, None, None,
+Fresno = Room([Nuke], 'Fresno, California', None, 'Plato', None, None, None, None,
               'Agricultural center. There is a small shack that you can see\
 in the corner')
-Berlin = Room(['Drag'], 'Berlin, Germany', None, None, None, 'Liege', None, None,
+Berlin = Room([Drag], 'Berlin, Germany', None, None, None, 'Liege', None, None,
               'Capital of the German Empire "Hallo!"')
 
 Maze = Room([''], 'Start of Confusing Tundra', 'Maze3', 'Maze2', None, 'Moscow', None, None,
@@ -614,11 +614,8 @@ Maze4 = Room([''], 'Confusing Tundra: This looks familiar...', None, 'Tokyo', No
              'It\'s cold and you don\'t know where to go.')
 Maze5 = Room([''], 'Confusing Tundra: This looks familiar...', None, None, 'Maze2', None, None, None,
              'It\'s cold and you don\'t know where to go.')
-Hiroshima = Room(['Nuke'], 'Hiroshima', None, None, None, 'Maze4', None, None,
+Hiroshima = Room([Nuke], 'Hiroshima', None, None, None, 'Maze4', None, None,
                  'Soon to be nuked')
-
-Bob.pick_up('Pencil')
-
 
 # static variables
 # Controller
@@ -634,32 +631,41 @@ Pickup = ['pick up']
 while is_alive is True:
     print(node.name)
     print(node.description)
-    print(node.items)
+    print(Bob.bag)
+    if len(node.items) > 0:
+        print()
+        print("There are following items(s):")
+        for num, item in enumerate(node.items):
+            print(str(num + 1) + ": " + item.name)
+        print()
     # Ask for input
     command = input('> ')
     if command in ['q', 'quit', 'exit']:
         sys.exit(0)
     else:
         if command in Pickup:
-            print('Pick up what?')
-            pickup = input('>')
-            if pickup in node.items:
-                Bob.pick_up(pickup)
-                listindex = node.items.index(pickup)
-                node.items.pop(listindex)
+            if len(node.items) > 0:
+                print()
+                print("Enter the number of the item to pick it up")
+                for num, item in enumerate(node.items):
+                    print(str(num + 1) + ": " + item.name)
+                print()
+                Take = input('>')
+                Bob.pick_up(Take)
+                node.items.pop(Take)
                 print(node.items)
-        else:
-            if command in Attacking:
-                print('Attack who?')
-                who = input('> ')
-
             else:
-                # Allows us to change nodes
-                if command in short_directions:
-                    command = directions[short_directions.index(command)]
+                if command in Attacking:
+                    print('Attack who?')
+                    who = input('> ')
 
-                # noinspection PyBroadException
-                try:
-                    node.move(command)
-                except:
-                    print('You can\'t')
+                else:
+                    # Allows us to change nodes
+                    if command in short_directions:
+                        command = directions[short_directions.index(command)]
+
+                        # noinspection PyBroadException
+                        try:
+                            node.move(command)
+                        except:
+                            print('You can\'t')
