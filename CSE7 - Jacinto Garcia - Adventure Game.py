@@ -1,20 +1,45 @@
 import random
 import sys
+
 rand = random.randint(1, 10)
 
+def combat(target):
+    print("You have%d health left" % Bob.health)
+    print("%s has %d health left" (target.name, target.health))
+    while target.health > 0 and Bob.health > 0:
 
+        move = input("> ")
+        print()
+        if move in ['q', 'quit', 'exit']:
+            sys.exit(0)
+        elif move == 'attack':
+            Bob.attack(target)
+            print("%s has %d health left." % (target.name, target.health))
+            print()
+        if target.isalive():
+            target.attack(Bob)
+        print("You have %d health left." % Bob.health)
+        print()
+    if Bob.health <= 0:
+        print("You Died")
+        sys.exit(0)
+    else:
+        print("You have defeated your opponent")
 class Character(object):
-    def __init__(self, name, health, dodamage, armor):
+    def __init__(self, name, health, dodamage, armor, bag=None, defaultweapon=None):
+        if bag is None:
+            bag = []
         self.dodamage = dodamage
         self.name = name
         self.health = health
-        self.bag = ['Poison']
+        self.bag = bag
         self.armor = armor
+        self.defaultweapon = defaultweapon
 
     def pick_up(self, items):
         self.bag.append(items)
-        print('You pick up the item')
-        print(self.bag)
+        # print(self.bag)
+        print()
 
     def attack(self, target):
 
@@ -37,6 +62,12 @@ class Player(Character):
     def __init__(self, name, health, dodamage, armor, xp):
         super(Player, self).__init__(name, health, dodamage, armor)
         self.xp = xp
+
+
+class NPC(Character):
+    def __init__(self, name, health, dodamage, armor, level):
+        super(NPC, self).__init__(name, health, dodamage, armor)
+        self.level = level
 
 
 class Item(object):
@@ -509,8 +540,9 @@ class Pencil(Tool):
             print("Your pencil needs to be sharpened")
 
 
-Bob = Character([''], 'Bob', 20, 20)
-Ronald = Character([''], 'Ronald M', 20, 20)
+GermanSoldier1 = NPC('Charles M', 80, 20, None, 2)
+GermanSoldier2 = NPC('Derek C', 80, 20, None, 2)
+GermanSoldier3 = NPC('Abel N', 80, 20, None, 2)
 Wep = Weapon('Generic Weapon', 20, 10)
 Gunn = Gun('Generic Gun', 20, 34, 12)
 Barrett = Barret('Pedro\'s Barret', 20, 19, 12)
@@ -526,26 +558,31 @@ Vehicle1 = Vehicle('Generic Vehicle', 20, 10, 10)
 Tri = Tricycle('Tricycle', 20, 10)
 Nitro1 = NitroTricycle('Nitro', 20, 10, 10)
 test = Vehicle("test", 100, 1, 1)
-Train = Train('Ay', 20, 1, 1)
-Plane = Plane('Ay', 20, 1, 1)
-Consumable1 = Consumable('Ay', 20, 1)
-Health = HealthKit('Ay', 20, 1, 1)
-Posion = Poison('Ay', 20, 1, 2)
-Expired = ExpiredCandy('Ay', 20, 2, 2)
+Train = Train('Train', 20, 1, 1)
+Plane = Plane('Fast Plane', 20, 1, 1)
+Consumable1 = Consumable('Consumable', 20, 1)
+Health = HealthKit('Health', 20, 1, 1)
+poison = Poison('Poison Drink', 20, 1, 2)
+poison2 = Poison('Poison Drink', 20, 1, 2)
+Expired = ExpiredCandy('Candy', 20, 2, 2)
 Waffle = Food('Waffle', 20, 1, 2)
-Armor = Armor('Ay', 20, 1, 1)
-Tool1 = Tool('Ay', 20, 1)
-Grapp = GrapplingHook('Ay', 20, 1)
-Good_Fishing_Rod = FishingRod('Ay', 20, 1)
-Wrench = Wrench('Ay', 20, 1)
-OldComputer = Computer('Ay', 20, 1, False)
+Armor = Armor('Armor', 20, 1, 1)
+Tool1 = Tool('Tool', 20, 1)
+Grapp = GrapplingHook('GrapplingHook', 20, 1)
+Good_Fishing_Rod = FishingRod('FishingRod', 20, 1)
+Wrench = Wrench('Wrench', 20, 1)
+OldComputer = Computer('Computer', 20, 1, False)
 Pencil = Pencil('Pencil', 20, 1, 1)
-
-
+Dragg = Dragunov("Pedro's Dragunov", 20, 20, 20)
+Bob = Character('Bob', 20, 20, 10, [poison], Dragg)
+Ronald = NPC('Ronald M', 80, 20, 10, 2)
 # World Map
 
+
 class Room(object):
-    def __init__(self, items, the_name, n, e, s, w, u, d, the_description):
+    def __init__(self, items, the_name, n, e, s, w, u, d, the_description, npc=None):
+        if npc is None:
+            self.npc = []
         self.name = the_name
         self.description = the_description
         self.north = n
@@ -555,67 +592,69 @@ class Room(object):
         self.up = u
         self.down = d
         self.items = items
+        self.npc = npc
 
     def move(self, direction):
         # This function allows movement to a different node.
         global node
         node = globals()[getattr(self, direction)]
 
+
 # Rooms
 London = Room([Gunn, Pencil], 'London, United Kingdom', None, 'Liege', 'Paris', 'Ocean', None, None,
-              'Industrial Center of the United Kingdom')
+              'Industrial Center of the United Kingdom', [Ronald])
 Liege = Room([Waffle], 'Liege, Belgium', None, 'Berlin', 'Switzerland', 'London', None, None,
-             'There is a waffle store near you.')
+             'There is a waffle store near you.', [])
 Washington = Room([OldComputer], 'Washington DC', None, 'Ocean', None, 'Plato', None, None,
                   'Woodrow Wilson recently gave his inaugural speech, but the\
-US hasn\'t entered the Great War yet')
+US hasn\'t entered the Great War yet', [])
 Paris = Room([Bomb], 'Paris, France', 'London', None, None, 'Ocean', None, None,
-             'You can see the eiffel tower')
+             'You can see the eiffel tower', [])
 Ocean = Room([Good_Fishing_Rod], 'The Pacific Ocean', None, 'Paris', None, 'Washington', None, None,
-             '6,000 kilometers of blue water')
+             '6,000 kilometers of blue water', [])
 Switzerland = Room([Wrench], 'Switzerland', 'Liege', 'Sarajevo', 'Gallipoli', None, None, None,
                    'A completely neutral country, there is almost nothing to\
-do here.')
+do here.', [])
 Gallipoli = Room([Gunn], 'Gallipoli, Italy', 'Switzerland', 'Constantinople', None, None, None, None,
                  'The Central Powers have completely taken this area over.\
- Watch your step!')
+ Watch your step!', [])
 
 Constantinople = Room([Belt], 'Constantinople, Ottoman Empire', 'Moscow', None, None, 'Gallipoli', None, None,
                       'Capital of the Ottoman Empire, there are many people looking\
- at you with a concerned face')
-Sarajevo = Room([Posion], 'Sarajevo, Austria-Hungary', None, None, None, 'Switzerland', None, None,
+ at you with a concerned face', [])
+Sarajevo = Room([poison2], 'Sarajevo, Austria-Hungary', None, None, None, 'Switzerland', None, None,
                 'The hearth of this brutal war.\
- You can see Austro-Hungarian solders down the street.')
+ You can see Austro-Hungarian solders down the street.', [])
 Moscow = Room([Belt], 'Moscow, Russian Empire', None, 'Maze', 'Constantinople', None, None, None,
               'Very cold. Atleast the Central Powers haven\'t \
- invaded yet...')
+ invaded yet...', [])
 
 Plato = Room([Blade], 'Plato, Missouri', None, 'Washington', None, 'Fresno', None, None,
-             'The mean center of the US population')
+             'The mean center of the US population', [])
 Philadelphia = Room(['Good_Fishing_Rod'], 'Philadelphia, Pennsylvania', 'New_York', None, 'Washington', None, None,
                     None,
                     'You can smell the Liberty bell where you are standing, or\
- it could be a cheesesteak...')
+ it could be a cheesesteak...', [])
 New_York = Room([Blade], 'New York, New York', None, None, 'Philadelphia', None, None, None,
-                'Most populous US city.')
+                'Most populous US city.', [])
 Fresno = Room([Nuke], 'Fresno, California', None, 'Plato', None, None, None, None,
               'Agricultural center. There is a small shack that you can see\
-in the corner')
+in the corner', [])
 Berlin = Room([Drag], 'Berlin, Germany', None, None, None, 'Liege', None, None,
-              'Capital of the German Empire "Hallo!"')
+              'Capital of the German Empire "Hallo!"', [])
 
-Maze = Room([''], 'Start of Confusing Tundra', 'Maze3', 'Maze2', None, 'Moscow', None, None,
-            'It\'s cold and you don\'t know where to go.')
-Maze2 = Room([''], 'Confusing Tundra: This looks familiar...', 'Maze5', 'Maze4', None, 'Maze', None, None,
-             'Your starting point')
-Maze3 = Room([''], 'Confusing Tundra: This looks familiar...', None, None, 'Maze', None, None, None,
-             'It\'s cold and you don\'t know where to go.')
-Maze4 = Room([''], 'Confusing Tundra: This looks familiar...', None, 'Tokyo', None, 'Maze2', None, None,
-             'It\'s cold and you don\'t know where to go.')
-Maze5 = Room([''], 'Confusing Tundra: This looks familiar...', None, None, 'Maze2', None, None, None,
-             'It\'s cold and you don\'t know where to go.')
-Hiroshima = Room([Nuke], 'Hiroshima', None, None, None, 'Maze4', None, None,
-                 'Soon to be nuked')
+Maze = Room([], 'Start of Confusing Tundra', 'Maze3', 'Maze2', None, 'Moscow', None, None,
+            'It\'s cold and you don\'t know where to go.', [])
+Maze2 = Room([], 'Confusing Tundra: This looks familiar...', 'Maze5', 'Maze4', None, 'Maze', None, None,
+             'Your starting point', [])
+Maze3 = Room([], 'Confusing Tundra: This looks familiar...', None, None, 'Maze', None, None, None,
+             'It\'s cold and you don\'t know where to go.', [])
+Maze4 = Room([], 'Confusing Tundra: This looks familiar...', None, 'Tokyo', None, 'Maze2', None, None,
+             'It\'s cold and you don\'t know where to go.', [])
+Maze5 = Room([], 'Confusing Tundra: This looks familiar...', None, None, 'Maze2', None, None, None,
+             'It\'s cold and you don\'t know where to go.', [])
+Tokyo = Room([Nuke], 'Tokyo', None, None, None, 'Maze4', None, None,
+             'Soon to be nuked', [])
 
 # static variables
 # Controller
@@ -624,14 +663,23 @@ directions = ['north', 'south', 'east', 'west', 'up', 'down']
 short_directions = ['n', 's', 'e', 'w', 'u', 'd']
 is_alive = True
 actions = []
-Attacking = ['hit', 'attack', 'shoot']
+attack = ['hit']
 Enemies = ['Ronald']
 Pickup = ['pick up']
-
+consume = ['eat', 'consume', ]
 while is_alive is True:
     print(node.name)
     print(node.description)
-    print(Bob.bag)
+    print()
+    print("You have the following items in your bag:")
+    for item in Bob.bag:
+        print(item.name)
+        print()
+    if len(node.npc) > 0:
+        print('There are the following NPCs in your area.')
+        for num, NPC in enumerate(node.npc):
+            print(str(num + 1) + ": " + NPC.name)
+            print()
     if len(node.items) > 0:
         print()
         print("There are following items(s):")
@@ -639,7 +687,9 @@ while is_alive is True:
             print(str(num + 1) + ": " + item.name)
         print()
     # Ask for input
+
     command = input('> ')
+
     if command in ['q', 'quit', 'exit']:
         sys.exit(0)
     else:
@@ -650,15 +700,20 @@ while is_alive is True:
                 for num, item in enumerate(node.items):
                     print(str(num + 1) + ": " + item.name)
                 print()
-                Take = input('>')
-                Bob.pick_up(Take)
-                node.items.pop(Take)
-                print(node.items)
+                command = int(input('>')) - 1
+                Bob.pick_up(node.items[command])
+                node.items.pop(command)
+        else:
+            if command in attack:
+                if len(node.npc) > 0:
+                    print("Enter the number of the NPC to attack it")
+                for num, NPC in enumerate(node.npc):
+                    print(str(num + 1) + ": " + NPC.name)
+                    print()
+                    print()
             else:
-                if command in Attacking:
-                    print('Attack who?')
-                    who = input('> ')
-
+                if command in consume:
+                    print()
                 else:
                     # Allows us to change nodes
                     if command in short_directions:
