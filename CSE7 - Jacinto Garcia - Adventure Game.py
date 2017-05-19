@@ -1,36 +1,34 @@
 import random
 import sys
 
-print("You are a young man named Bob, you have been enlisted in the army to fight for your country. Travel the world "
-      "and discover new adventures. Do well.")
+print("You are a young man named Stanley Wilbur, you have been enlisted in the army to fight for your country in "
+      "the great war. Travel the world and discover new adventures. Good Luck.")
 print()
 print('For a list of commands type "help"')
 
-commands = 'Remember to pick up weapons and equip them! (attack for combat, equip for weapons, consume, ' \
-           'pick up, n, e, s, w to move)'
+commands = '|Remember to pick up weapons and equip them! (say "attack" for combat, "equip" to equip weapons, ' \
+           '"consume" for healthkits, "pick up", and "n, e, s, w" to move) You can only equip weapons|'
 
 
 def combat(target):
-
     print("You have entered combat with %s" % target.name)
     print()
-    print("You have %d health left." % Bob.health)
+    print("You have %d health left." % Stan.health)
     print("%s has %d health left." % (target.name, target.health))
-    while target.health > 0 and Bob.health > 0:
+    while target.health > 0 and Stan.health > 0:
 
         move = input("> ")
         print()
         if move == 'equip':
             print("Enter the number of the item to equip it")
-            for numb, equip in enumerate(Bob.bag):
+            for numb, equip in enumerate(Stan.bag):
                 print(str(numb + 1) + ": " + equip.name)
             print()
-            print()
             move = int(input('>')) - 1
-            if Bob.bag[move].isweapon is True:
-                Bob.defaultweapon = Bob.bag[move]
+            if Stan.bag[move].isweapon is True:
+                Stan.defaultweapon = Stan.bag[move]
                 print('You equip the item')
-            elif Bob.bag[move].isweapon is not True:
+            elif Stan.bag[move].isweapon is not True:
                 print('Item is not weapon')
         if move in ['help', 'ayuda']:
             print(commands)
@@ -38,25 +36,27 @@ def combat(target):
         if move in ['q', 'quit', 'exit']:
             sys.exit(0)
         elif move in ['attack', 'hit', 'shoot']:
-            Bob.attack(target)
+            Stan.attack(target)
             print("%s has %d health left." % (target.name, target.health))
             print()
             if target.isalive():
-                target.attack(Bob)
-                print("You have %d health left." % Bob.health)
+                target.attack(Stan)
+                print("You have %d health left." % Stan.health)
                 print()
 
-    if Bob.health <= 0:
-        print("GAME OVER")
+    if Stan.health <= 0:
+        print("YOU DIED, GAME OVER")
         sys.exit(0)
     else:
         print("You defeat %s" % target.name)
-        Bob.xp += 10
-        print('You gain 10 xp points. You now have %s xp' % Bob.xp)
-        Bob.levelup()
+        Stan.xp += 10
+        print('You gain 10 xp points. You now have %s xp' % Stan.xp)
+        print('You find 20 sheckles off his pockets.')
+        Stan.money += 20
+        Stan.levelup()
         if Tokyo.npc is None:
             print("You have brought peace to the world using %s, now you can live a normal life back home. "
-                  % Bob.defaultweapon.name)
+                  % Stan.defaultweapon.name)
 
 
 class Character(object):
@@ -122,26 +122,27 @@ class NPC(Character):
 
 
 class Item(object):
-    def __init__(self, name, value, isweapon):
+    def __init__(self, name, value, isweapon, isconsumable):
         self.name = name
         self.value = value
         self.isweapon = isweapon
+        self.isconsumable = isconsumable
 
     def sell(self):
         print("You sell %s for %d sheckles." % (self.name, self.value))
         # Weapons
 
     def equip(self):
-        Bob.defaultweapon = None
-        if Bob.defaultweapon is None:
-            Bob.defaultweapon = self
+        Stan.defaultweapon = None
+        if Stan.defaultweapon is None:
+            Stan.defaultweapon = self
         print('You equip %s' % self.name)
 
 
 # 3
 class Weapon(Item):
-    def __init__(self, name, value, damage, isweapon):
-        super(Weapon, self).__init__(name, value, isweapon)
+    def __init__(self, name, value, damage, isweapon, isconsumable=False):
+        super(Weapon, self).__init__(name, value, isweapon, isconsumable)
         self.damage = damage
         self.isweapon = True
 
@@ -151,8 +152,8 @@ class Weapon(Item):
 
 # 4
 class Gun(Weapon):
-    def __init__(self, name, value, damage, ammo, isweapon):
-        super(Gun, self).__init__(name, value, damage, isweapon)
+    def __init__(self, name, value, damage, ammo, isweapon, isconsumable):
+        super(Gun, self).__init__(name, value, damage, isweapon, isconsumable)
         self.ammo = ammo
 
     def attack(self, target):
@@ -171,21 +172,21 @@ class Gun(Weapon):
 
 # 5
 class Sniper(Gun):
-    def __init__(self, name, value, damage, ammo, isweapon):
-        super(Sniper, self).__init__(name, value, damage, ammo, isweapon)
+    def __init__(self, name, value, damage, ammo, isweapon, isconsumable):
+        super(Sniper, self).__init__(name, value, damage, ammo, isweapon, isconsumable)
 
     def attack(self, target):
         rand = random.randint(1, 10)
         if rand >= 8:
             if target.health > 0:
-                    if self.ammo > 0:
-                        self.ammo -= 1
-                        print("You quickscope %s for %d damage." % (target.name, self.damage))
-                        target.health -= self.damage
-                        if self.ammo <= 0:
-                            print("You run out of ammo.")
-                    else:
-                        print("Your gun does not have ammo.")
+                if self.ammo > 0:
+                    self.ammo -= 1
+                    print("You quickscope %s for %d damage." % (target.name, self.damage))
+                    target.health -= self.damage
+                    if self.ammo <= 0:
+                        print("You run out of ammo.")
+                else:
+                    print("Your gun does not have ammo.")
             else:
                 print("%s does not have health." % target.name)
         else:
@@ -194,8 +195,8 @@ class Sniper(Gun):
 
 # 6
 class Dragunov(Gun):
-    def __init__(self, name, value, damage, ammo, isweapon):
-        super(Dragunov, self).__init__(name, value, damage, ammo, isweapon)
+    def __init__(self, name, value, damage, ammo, isweapon, isconsumable):
+        super(Dragunov, self).__init__(name, value, damage, ammo, isweapon, isconsumable)
 
     def attack(self, target):
         if target.health > 0:
@@ -272,17 +273,21 @@ class Flashbang(Weapon):
 
 # 11
 class NuclearBomb(Weapon):
-    def __init__(self, name, value, damage, isweapon):
+    def __init__(self, name, value, damage, uses, isweapon):
         super(NuclearBomb, self).__init__(name, value, damage, isweapon)
+        self.uses = uses
 
     def attack(self, target):
-        if target.health >= 0:
-            print("You end %s and humanity itself." % target.name)
-            target.health -= self.damage
-            if target.health <= 0:
-                print("%s has been slain" % target.name)
+        if self.uses > 0:
+            if target.health >= 0:
+                print("You wipe %s from existence." % target.name)
+                target.health -= self.damage
+                if target.health <= 0:
+                    print("%s has been slain" % target.name)
+            else:
+                print("%s is already dead") % target.name
         else:
-            print("%s is already dead") % target.name
+            print('Your nuke is useless now.')
 
 
 # 12
@@ -309,8 +314,8 @@ class BrokenProtractor(Weapon):
 
 # 14
 class Vehicle(Item):
-    def __init__(self, name, value, speed, gas, isweapon):
-        super(Vehicle, self).__init__(name, value, isweapon)
+    def __init__(self, name, value, speed, gas, isweapon, isconsumable):
+        super(Vehicle, self).__init__(name, value, isweapon, isconsumable)
         self.speed = speed
         self.gas = gas
         self.isweapon = False
@@ -328,8 +333,8 @@ class Vehicle(Item):
 
 # 15
 class Tricycle(Item):
-    def __init__(self, name, value, speed, isweapon):
-        super(Tricycle, self).__init__(name, value, isweapon)
+    def __init__(self, name, value, speed, isweapon, isconsumable):
+        super(Tricycle, self).__init__(name, value, isweapon, isconsumable)
         self.speed = speed
         self.isweapon = False
 
@@ -339,8 +344,8 @@ class Tricycle(Item):
 
 # 16
 class NitroTricycle(Tricycle):
-    def __init__(self, name, value, speed, gas, isweapon):
-        super(NitroTricycle, self).__init__(name, value, speed, isweapon)
+    def __init__(self, name, value, speed, gas, isweapon, isconsumable):
+        super(NitroTricycle, self).__init__(name, value, speed, isweapon, isconsumable)
         self.gas = gas
 
     def move(self):
@@ -394,12 +399,12 @@ class Consumable(Item):
         self.uses = uses
         self.isweapon = False
 
-    def consume(self, target, basehp):
+    def consume(self, target):
         if self.uses > 0:
             print("%s consumes the item." % target.name)
             self.uses -= 1
-            if target.health > basehp:
-                target.health = basehp
+            if target.health > Stan.basehp:
+                target.health = Stan.basehp
             if self.uses <= 0:
                 print("You run out of the item.")
         else:
@@ -412,12 +417,12 @@ class HealthKit(Consumable):
         super(HealthKit, self).__init__(name, value, uses, isweapon)
         self.health_regen = health_regen
 
-    def consume(self, target, basehp):
+    def consume(self, target):
         print("You consume the health kit.")
         self.uses -= 1
         target.health += self.health_regen
-        if target.health > basehp:
-            target.health = basehp
+        if target.health > Stan.basehp:
+            target.health = Stan.basehp
         if self.uses <= 0:
             print("You run out of the health kit.")
 
@@ -428,7 +433,7 @@ class Poison(Consumable):
         super(Poison, self).__init__(name, value, uses, isweapon)
         self.health_loss = health_loss
 
-    def consume(self, target, basehp):
+    def consume(self, target):
         if self.uses > 0:
             print("You consume the poison.")
             self.uses -= 1
@@ -447,7 +452,7 @@ class ExpiredCandy(Consumable):
         super(ExpiredCandy, self).__init__(name, value, uses, isweapon)
         self.health_loss = health_loss
 
-    def consume(self, target, basehp):
+    def consume(self, target):
         if self.uses > 0:
             print("You consume the expired candy.")
             self.uses -= 1
@@ -465,7 +470,7 @@ class Food(Consumable):
         super(Food, self).__init__(name, value, uses, isweapon)
         self.health_regen = health_regen
 
-    def consume(self, target, basehp):
+    def consume(self, target):
         if self.uses > 0:
             print("You consume the food.")
             self.uses -= 1
@@ -619,7 +624,7 @@ GermanSoldier5 = NPC('Zimmer M', 80, 20, None, 2)
 GermanSoldier6 = NPC('Mister M', 80, 20, None, 2)
 AustrianSoldier1 = NPC('Charles M', 80, 20, None, 2)
 
-Lewis = Gun('Lewis Assault Rifle', 20, 10, 50, True)
+Lewis = Gun('Lewis Assault Rifle', 20, 40, 50, True)
 Luger = Gun('Luger Pistol', 15, 20, 80, True)
 Barrett = Sniper('Pedro\'s Barret', 50, 200, 10, True)
 Drag = Dragunov('Dragunov', 20, 50, 50, True)
@@ -627,19 +632,27 @@ M1911 = Gun('M1911', 20, 30, 30, True)
 Blade = Switchblade('Switchblade', 20, 10, 10, True)
 Bomb = Bomb('Bomb', 20, 10, True)
 Flash = Flashbang('FlashBang', 20, 19, 18, True)
-Nuke = NuclearBomb('Nuke', 20, 1000, True)
-Nuke2 = NuclearBomb('Nuke', 20, 1000, True)
+Nuke = NuclearBomb('Nuke', 20, 1000, 1, True)
+Nuke2 = NuclearBomb('Nuke', 20, 1000, 1, True)
 Belt = Belt('My Belt', 20, 10, True)
 Pro = BrokenProtractor('Broken Protractor', 20, 10, True)
 Gewehr = Sniper('Fancy Gewehr', 15, 25, 15, True)
 Dragg = Dragunov("Pedro's Dragunov", 20, 20, 20, True)
 MachineGun = Gun('Vickers Machine Gun', 100, 70, 30, True)
+Raygun = Gun('ReyGun', 150, 45, 100, True)
 
 Health = HealthKit('Healthkit', 20, 1, 100, False)
 Health2 = HealthKit('Healthkit', 20, 1, 100, False)
 Health3 = HealthKit('Healthkit', 20, 1, 100, False)
 Health4 = HealthKit('Healthkit', 20, 1, 100, False)
 Health5 = HealthKit('Healthkit', 20, 1, 100, False)
+Health10 = HealthKit('Healthkit', 20, 1, 100, False)
+Health11 = HealthKit('Healthkit', 25, 1, 100, False)
+Health12 = HealthKit('Healthkit', 25, 1, 100, False)
+Health13 = HealthKit('Healthkit', 25, 1, 100, False)
+Health14 = HealthKit('Healthkit', 25, 1, 100, False)
+Health15 = HealthKit('Healthkit', 25, 1, 100, False)
+
 Waffle = Food('Waffle', 20, 1, 40, False)
 Grapp = GrapplingHook('GrapplingHook', 40, 10, False)
 Good_Fishing_Rod = FishingRod('FishingRod', 20, 1, False)
@@ -647,7 +660,7 @@ Good_Fishing_Rod = FishingRod('FishingRod', 20, 1, False)
 Wrench = Wrench('Wrench', 20, 1, False)
 Key = Tool('Key', 5, 70, False)
 
-Bob = Player('Bob', 150, 150, 10, 0, [Health], None, 0, 50)
+Stan = Player('Stanley Wilbur', 150, 150, 10, 0, [Health], None, 0, 50)
 Ronald = NPC('Ronald M', 80, 20, 20, 2)
 Boss = NPC('German Boss Dude', 500, 50, 0, 10)
 
@@ -682,7 +695,7 @@ class Shop(Room):
             self.buyable = []
 
     def buy(self):
-        print('You have %s sheckles' % Bob.money)
+        print('You have %s sheckles' % Stan.money)
         print('----------------------------------------------------------------------------------------------')
         print('Type the number of the item of what you want to buy')
         print('Here is what you can buy: ')
@@ -693,18 +706,19 @@ class Shop(Room):
         print()
         print()
         buy = int(input('>')) - 1
-        if Bob.money >= Shopping.buyable[buy].value:
-            Bob.money -= Shopping.buyable[buy].value
-            Bob.pick_up(Shopping.buyable[buy])
+        if Stan.money >= Shopping.buyable[buy].value:
+            Stan.money -= Shopping.buyable[buy].value
+            Stan.pick_up(Shopping.buyable[buy])
             Shopping.buyable.pop(buy)
         else:
             print('You do not have enough money')
-        print('You now have %s sheckles' % Bob.money)
+        print('You now have %s sheckles' % Stan.money)
+
 
 # Rooms
 Shopping = Shop([], 'Manchester, United Kingdom', None, None, 'London', None, None, None, 'Stay here and shop for '
                                                                                           'items!(Type "buy" to shop)',
-                None, [Barrett, ])
+                None, [Barrett, Raygun, Health10, Health11])
 London = Room([Luger, Health2], 'London, United Kingdom', 'Shopping', 'Liege', 'Paris', 'Ocean', None, None,
               'Industrial Center of the United Kingdom', None)
 Liege = Room([Waffle], 'Liege, Belgium', None, 'Berlin', 'Switzerland', 'London', None, None,
@@ -767,11 +781,12 @@ short_directions = ['n', 's', 'e', 'w', 'u', 'd']
 is_alive = True
 Pickup = ['pick up']
 while is_alive is True:
+
     if Tokyo.npc is None:
-        print('-------------------------------------------------------------------------------------------')
+        print('------------------------------------------------------------------------------------------------')
         print("You have brought peace to the world using %s, now you can live a normal life back home. "
-              % Bob.defaultweapon.name)
-        print("-------------------------------------------------------------------------------------------")
+              % Stan.defaultweapon.name)
+        print("------------------------------------------------------------------------------------------------")
         sys.exit(0)
     if node.npc is not None:
         combat(node.npc)
@@ -783,7 +798,7 @@ while is_alive is True:
     print('----------------------------------------------------------------------------------------------------')
     print()
     print("You have the following items in your bag:")
-    for item in Bob.bag:
+    for item in Stan.bag:
         print(item.name)
     print()
     if len(node.items) > 0:
@@ -795,6 +810,7 @@ while is_alive is True:
     # Ask for input
 
     command = input('> ')
+
     if command == 'buy':
         if node == Shopping:
             Shopping.buy()
@@ -809,37 +825,37 @@ while is_alive is True:
                     print(str(num + 1) + ": " + item.name)
                 print()
                 command = int(input('>')) - 1
-                Bob.pick_up(node.items[command])
+                Stan.pick_up(node.items[command])
                 node.items.pop(command)
         else:
             if command == 'equip':
                 print("Enter the number of the item to equip it")
-                for num, Weapon in enumerate(Bob.bag):
+                for num, Weapon in enumerate(Stan.bag):
                     print(str(num + 1) + ": " + Weapon.name)
                 print()
                 print()
                 command = int(input('>')) - 1
-                if Bob.bag[command].isweapon is True:
-                    Bob.defaultweapon = Bob.bag[command]
-                    print(Bob.defaultweapon.name)
-                elif Bob.bag[command].isweapon is not True:
+                if Stan.bag[command].isweapon is True:
+                    Stan.defaultweapon = Stan.bag[command]
+                    print(Stan.defaultweapon.name)
+                elif Stan.bag[command].isweapon is not True:
                     print('Item is not weapon')
             else:
                 if command == 'unequip':
-                    Bob.defaultweapon = None
+                    Stan.defaultweapon = None
 
                 else:
                     if command == 'consume':
                         print("Enter the number of the item to consume it")
-                        for num, Consumable in enumerate(Bob.bag):
+                        for num, Consumable in enumerate(Stan.bag):
                             print(str(num + 1) + ": " + Consumable.name)
                         print()
                         print()
                         command = int(input('>')) - 1
-                        Bob.bag[command].consume(Bob)
-                        Bob.bag.pop(command)
-                        if Bob.health > 150:
-                            Bob.health = 150
+                        Stan.bag[command].consume(Stan)
+                        Stan.bag.pop(command)
+                        if Stan.health > 150:
+                            Stan.health = 150
 
                     else:
                         if command == 'help':
@@ -854,6 +870,7 @@ while is_alive is True:
                             # noinspection PyBroadException
                             try:
                                 node.move(command)
+
                             except KeyError:
                                 print("You can't!")
                             except AttributeError:
