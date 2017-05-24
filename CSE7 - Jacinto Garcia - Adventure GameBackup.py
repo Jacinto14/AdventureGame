@@ -1,18 +1,13 @@
 import random
 import sys
 
-RED = '\033[91m'
-BOLD = '\033[1m'
-END = '\033[0m'
 print("You are a young man named Stanley Wilbur, you have been enlisted in the army to fight for your country in "
       "the great war. Travel the world and discover new adventures. Good Luck.")
 print()
 print('For a list of commands type "help"')
 
-commands = 'Remember to pick up weapons and equip them!'
-command1 = 'Say "attack" for combat, "equip" to equip weapons'
-command2 = 'Say "Consume" for healthkits, "pick up", and "n, e, s, w" to move'
-command3 = 'You can only equip weapons'
+commands = '|Remember to pick up weapons and equip them! (say "attack" for combat, "equip" to equip weapons, ' \
+           '"consume" for healthkits, "pick up", and "n, e, s, w" to move) You can only equip weapons|'
 
 
 def combat(target):
@@ -24,18 +19,6 @@ def combat(target):
 
         move = input("> ")
         print()
-        if move == 'consume':
-            print("Enter the number of the item to consume it")
-            for num, Bonsumable in enumerate(Stan.bag):
-                print(str(num + 1) + ": " + Bonsumable.name)
-            print()
-            print()
-            command = int(input('>')) - 1
-            if Stan.bag[command].isconsumable is True:
-                Stan.bag[command].consume(Stan)
-                Stan.bag.pop(command)
-                if Stan.health > 150:
-                    Stan.health = 150
         if move == 'equip':
             print("Enter the number of the item to equip it")
             for numb, equip in enumerate(Stan.bag):
@@ -49,9 +32,6 @@ def combat(target):
                 print('Item is not weapon')
         if move in ['help', 'ayuda']:
             print(commands)
-            print(command1)
-            print(command2)
-            print(command3)
             print()
         if move in ['q', 'quit', 'exit']:
             sys.exit(0)
@@ -150,7 +130,7 @@ class Item(object):
 
     def sell(self):
         print("You sell %s for %d sheckles." % (self.name, self.value))
-        Stan.money += self.value
+        # Weapons
 
     def equip(self):
         Stan.defaultweapon = None
@@ -197,7 +177,7 @@ class Sniper(Gun):
 
     def attack(self, target):
         rand = random.randint(1, 10)
-        if rand >= 2:
+        if rand >= 8:
             if target.health > 0:
                 if self.ammo > 0:
                     self.ammo -= 1
@@ -644,12 +624,12 @@ GermanSoldier2 = NPC('Derek C', 80, 20, None, 2)
 GermanSoldier3 = NPC('Abel N', 80, 20, None, 2)
 GermanSoldier4 = NPC('George B', 100, 22, None, 2)
 GermanSoldier5 = NPC('Zimmer M', 80, 20, None, 2)
-GermanSoldier6 = NPC('Bandit', 80, 20, None, 2)
+GermanSoldier6 = NPC('Mister M', 80, 20, None, 2)
 AustrianSoldier1 = NPC('Charles M', 80, 20, None, 2)
 
 Lewis = Gun('Lewis Assault Rifle', 20, 40, 50, True, False)
 Luger = Gun('Luger Pistol', 15, 20, 80, True, False)
-Barrett = Sniper('Pedro\'s Barret', 60, 70, 20, True, False)
+Barrett = Sniper('Pedro\'s Barret', 50, 200, 10, True, False)
 Drag = Dragunov('Dragunov', 20, 50, 50, True, False)
 M1911 = Gun('M1911', 20, 30, 30, True, False)
 Blade = Switchblade('Switchblade', 20, 10, 10, True, False)
@@ -662,7 +642,7 @@ Pro = BrokenProtractor('Broken Protractor', 20, 10, True, False)
 Gewehr = Sniper('Fancy Gewehr', 15, 25, 15, True, False)
 Dragg = Dragunov("Pedro's Dragunov", 20, 20, 20, True, False)
 MachineGun = Gun('Vickers Machine Gun', 100, 70, 30, True, False)
-Raygun = Gun('ReyGun', 200, 100, 100, True, False)
+Raygun = Gun('ReyGun', 150, 45, 100, True, False)
 
 Health = HealthKit('Healthkit', 20, 1, 100, False, True)
 Health2 = HealthKit('Healthkit', 20, 1, 100, False, True)
@@ -677,11 +657,11 @@ Health14 = HealthKit('Healthkit', 25, 1, 100, False, True)
 Health15 = HealthKit('Healthkit', 25, 1, 100, False, True)
 
 Waffle = Food('Waffle', 20, 1, 40, False, True)
-Grapp = GrapplingHook('GrapplingHook', 40, 10, False, False)
-Good_Fishing_Rod = FishingRod('FishingRod', 20, 1, False, False)
+Grapp = GrapplingHook('GrapplingHook', 40, 10, False, True)
+Good_Fishing_Rod = FishingRod('FishingRod', 20, 1, False, True)
 
-Wrench = Wrench('Wrench', 20, 1, False, False)
-Key = Tool('Key', 100, 1, False, False)
+Wrench = Wrench('Wrench', 20, 1, False, True)
+Key = Tool('Key', 5, 70, False, True)
 
 Stan = Player('Stanley Wilbur', 150, 150, 10, 0, [Health], None, 0, 50)
 Ronald = NPC('Ronald M', 80, 20, 20, 2)
@@ -717,19 +697,6 @@ class Shop(Room):
         if self.buyable is None:
             self.buyable = []
 
-    def sell(self):
-        print('----------------------------------------------------------------------------------------------')
-        print('What would you like to sell?')
-        print()
-        print('Type the number of the item of what you want to sell')
-        print('Here is what you can sell: ')
-        print()
-        for number, sell in enumerate(Stan.bag):
-            print(str(number + 1) + ": " + sell.name + " for %s sheckles" % sell.value)
-        sell = int(input('>')) - 1
-        Stan.bag[sell].sell()
-        Stan.bag.pop(sell)
-
     def buy(self):
         print('You have %s sheckles' % Stan.money)
         print('----------------------------------------------------------------------------------------------')
@@ -753,7 +720,7 @@ class Shop(Room):
 
 # Rooms
 Shopping = Shop([], 'Manchester, United Kingdom', None, None, 'London', None, None, None, 'Stay here and shop for '
-                                                                                          'items!(Type "buy" to shop, Type "sell" to sell)',
+                                                                                          'items!(Type "buy" to shop)',
                 None, [Barrett, Raygun, Health10, Health11])
 London = Room([Luger, Health2], 'London, United Kingdom', 'Shopping', 'Liege', 'Paris', 'Ocean', None, None,
               'Industrial Center of the United Kingdom', None)
@@ -784,12 +751,12 @@ Moscow = Room([Health3], 'Moscow, Russian Empire', None, 'Maze', 'Constantinople
 invaded yet...', None)
 
 Plato = Room([Blade], 'Plato, Missouri', None, 'Washington', None, 'Fresno', None, None,
-             'The mean center of the US population', GermanSoldier5)
+             'The mean center of the US population', None)
 Philadelphia = Room([Good_Fishing_Rod], 'Philadelphia, Pennsylvania', 'New_York', None, 'Washington', None, None,
                     None,
                     'You can smell the Liberty bell where you are standing, or\
-it could be a cheesesteak...', GermanSoldier6)
-New_York = Room([MachineGun, Health4], 'New York, New York', None, None, 'Washington', None, None, None,
+it could be a cheesesteak...', None)
+New_York = Room([MachineGun, Health4], 'New York, New York', None, None, 'Philadelphia', None, None, None,
                 'Most populous US city.', None)
 Fresno = Room([Nuke], 'Fresno, California', None, 'Plato', None, None, None, None,
               'Agricultural center. There is a small shack that you can see\
@@ -807,7 +774,7 @@ Maze4 = Room([Gewehr], 'Confusing Tundra: This looks familiar...', None, 'Tokyo'
 Maze5 = Room([], 'Confusing Tundra: This looks familiar...', None, None, 'Maze2', None, None, None,
              'It\'s cold and you don\'t know where to go.', None)
 Tokyo = Room([Nuke2], 'Tokyo', None, None, None, 'Maze4', None, None,
-             BOLD + RED + 'END OF THE LINE. THE WOLRD THANKS YOU' + END, Boss)
+             'Soon to be nuked', Boss)
 
 # static variables
 # Controller
@@ -820,11 +787,10 @@ while is_alive is True:
 
     if Tokyo.npc is None:
         print('------------------------------------------------------------------------------------------------')
-        print(BOLD + RED + "The world thanks you for making the world a better place using a(n) %s. "
+        print("You have brought peace to the world using %s, now you can live a normal life back home. "
               % Stan.defaultweapon.name)
-        print('Now you can life a normal life back home, or keep exploring the world.' + END)
         print("------------------------------------------------------------------------------------------------")
-
+        sys.exit(0)
     if node.npc is not None:
         combat(node.npc)
         node.npc = None
@@ -847,9 +813,6 @@ while is_alive is True:
     # Ask for input
 
     command = input('> ')
-    if command == 'sell':
-        if node == Shopping:
-            Shopping.sell()
 
     if command == 'buy':
         if node == Shopping:
@@ -903,10 +866,6 @@ while is_alive is True:
                     else:
                         if command == 'help':
                             print(commands)
-                            print(command1)
-                            print(command2)
-                            print(command3)
-
                             print()
 
                         # Allows us to change nodes
@@ -920,4 +879,6 @@ while is_alive is True:
                                 print("You can't!")
                             except AttributeError:
                                 print("<PLACEHOLDER> Unknown Command.")
+    print('----------------------------------------------------------------------------------------------------')
+    print('----------------------------------------------------------------------------------------------------')
     print('----------------------------------------------------------------------------------------------------')
